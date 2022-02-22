@@ -15,7 +15,7 @@ export class DataStorageService {
     private recipesService: RecipeService,
     private authService: AuthService
   ) {}
-  url = `https://angular-http-65b41-default-rtdb.firebaseio.com/`;
+  url = `https://angular-http-f9c68-default-rtdb.firebaseio.com/`;
   error = new Subject<string>();
 
   createAndStoreRecipes() {
