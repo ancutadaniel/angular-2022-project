@@ -149,9 +149,7 @@ export class AuthEffects {
   @Effect({ dispatch: false })
   autoLogin = this.actions$.pipe(
     ofType(AuthActions.AUTO_LOGIN),
-    map((data) => {
-      console.log("data", data);
-
+    map(() => {
       const userData: {
         email: string;
         id: string;
@@ -177,14 +175,12 @@ export class AuthEffects {
 
         this.authService.setLogoutTimer(expirationDuration);
 
-        return of(
-          new AuthActions.AuthenticatedSuccess({
-            email: loadedUser.email,
-            userId: loadedUser.id,
-            token: loadedUser.token,
-            expirationDate: new Date(userData._tokenExpirationDate),
-          })
-        );
+        return new AuthActions.AuthenticatedSuccess({
+          email: loadedUser.email,
+          userId: loadedUser.id,
+          token: loadedUser.token,
+          expirationDate: new Date(userData._tokenExpirationDate),
+        });
       }
       return { type: "DUMMY" };
     })
