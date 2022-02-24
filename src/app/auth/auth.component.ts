@@ -31,6 +31,7 @@ export class AuthComponent implements OnInit, OnDestroy {
   alertHost: PlaceholderDirective;
 
   private closeSub: Subscription;
+  private storeSub: Subscription;
 
   constructor(
     private authService: AuthService,
@@ -40,7 +41,7 @@ export class AuthComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.store.select("auth").subscribe((authState) => {
+    this.storeSub = this.store.select("auth").subscribe((authState) => {
       this.isLoading = authState.loading;
       this.errorMessage = authState.authError;
 
@@ -52,30 +53,14 @@ export class AuthComponent implements OnInit, OnDestroy {
     if (!f.valid) return;
     const email = f.value.email;
     const password = f.value.password;
-    this.isLoading = true;
-
-    let authObs: Observable<AuthDataResponse>;
 
     if (this.isLogin) {
       // authObs = this.authService.login(email, password);
       this.store.dispatch(new AuthActions.LoginStart({ email, password }));
     } else {
-      authObs = this.authService.signup(email, password);
+      // authObs = this.authService.signup(email, password);
+      this.store.dispatch(new AuthActions.SignupStart({ email, password }));
     }
-
-    // authObs.subscribe(
-    //   (response) => {
-    //     this.isLoading = false;
-    //     // console.log(response);
-    //     this.router.navigate(["/recipes"]);
-    //   },
-    //   (err) => {
-    //     console.log("err", err);
-    //     this.isLoading = false;
-    //     this.errorMessage = err;
-    //     this.showErrorAlert(err);
-    //   }
-    // );
 
     f.reset();
   }
@@ -85,12 +70,12 @@ export class AuthComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.authSubscription.unsubscribe();
     if (this.closeSub) this.closeSub.unsubscribe();
+    if (this.storeSub) this.storeSub.unsubscribe();
   }
 
   onHandlerError() {
-    this.errorMessage = null;
+    this.store.dispatch(new AuthActions.ClearError(null));
   }
 
   // show error programmatically
